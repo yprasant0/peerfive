@@ -1,6 +1,9 @@
 <div class ="form">
-<%= simple_form_for :user, url: users_path, method: "POST", html: { class: 'form-inline' } do |f| %>
-  <%= f.input :name %>   
+
+<%= form_for @user do |f|  %>
+  <%= f.label :name %>   
+  <%=f.text_field :name %>
+  <br>
   <br>
   <%= f.submit "Save", class: "btn btn-primary" %>
 <% end %>

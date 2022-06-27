@@ -4,7 +4,7 @@ class UsersController < ApplicationController
     @users = User.all
     if @users.present?
       respond_to do |format|
-        format.html
+        format.html { render 'users/index', locals: { :users => @users }}
         format.json { render json: @users }
       end
     end
@@ -25,15 +25,44 @@ class UsersController < ApplicationController
     end
   end
 
-  def edit
-    user = User.find(params[:id])
+  def new
+    @user = User.new
+  end
+
+  def edit 
+    @user = user = User.find(params[:id])
+  end
+
+  def update
+    @user = User.find(params[:id])
     respond_to do |format|
-      if user.update_attributes(user_params)
+      if @user.update(user_params)
         format.html { redirect_to(users_path, :notice => 'User updated.') }
         format.json { head :no_content }
       else
         format.html { render :action => "edit" }
-        format.json { render :json => user.errors, :status => :unprocessable_entity }
+        format.json { render :json => @user.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  def searches
+    query = params[:search]
+    @users = User.all
+    @names = []
+    if query.present?
+      @users.each do |user|
+        name = user.name[0, query.length]
+         if name == query 
+          @names << user
+         end
+      end
+    end
+    pp @names
+    if @names.present?
+      respond_to do |format|
+        format.html { render 'users/search', :collection => @names } 
+        format.json { render json: @names }
       end
     end
   end
@@ -41,6 +70,6 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params[:user].permit(:name, :P5, :reward, :id)
+    params[:user].permit(:name, :P5, :reward, :id, :search)
   end
 end
